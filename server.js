@@ -1,8 +1,8 @@
-var Botkit = require('Botkit')
+var Botkit = require('botkit')
 
-var accessToken = preocess.env.FACEBOOK_PAGE_ACCESS_TOKEN
+var accessToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN
 var verifyToken = process.env.FACEBOOK_VERIFY_TOKEN
-var port = process.env.port
+var port = process.env.PORT
 
 if (!accessToken) throw new Error('FACEBOOK_PAGE_ACCESS_TOKEN is required but missing')
 if (!verifyToken) throw new Error('FACEBOOK_VERIFY_TOKEN is required but missing')
@@ -15,62 +15,60 @@ var controller = Botkit.facebookbot({
 
 var bot = controller.spawn()
 
-controller.setupWebserver(port, function(err, webserver){
+controller.setupWebserver(port, function (err, webserver) {
   if (err) return console.log(err)
-  controller.createWebhookEndpoints(webserver, bot, function(){
-    console.log('Ready player 1')
+  controller.createWebhookEndpoints(webserver, bot, function () {
+    console.log('Ready Player 1')
   })
 })
 
-controller.hears(['hello','hi'], 'message received', function(bot, message){
-  bot.reply(message, 'Helo!')
+controller.hears(['hello', 'hi'], 'message_received', function (bot, message) {
+  bot.reply(message, 'Hello!')
   bot.reply(message, 'I want to show you something')
   bot.reply(message, {
-
     attachment: {
       type: 'template',
       payload: {
         template_type: 'button',
-        text: 'This is test text',
-        buttons:[{
-          type: 'web_url',
-          url: 'https://www.oculus.com/en-us/rift/',
-          title: 'Open Web URL'
-        }, {
-          type: 'postback',
-          title: 'cat',
-          payload: 'show_cat'
-        }, {
-          type: 'postback',
-          title: 'dog',
-          payload: 'show_dog'
-        }]
+        text: 'Which do you prefer',
+        buttons: [
+          {
+            type: 'postback',
+            title: 'Cats',
+            payload: 'show_cat'
+          },
+          {
+            type: 'postback',
+            title: 'Dogs',
+            payload: 'show_dog'
+          }
+        ]
       }
     }
   })
 })
 
-controller.on('facebook_postback', function (bot,message){
-  swich(message.payload){
+controller.on('facebook_postback', function (bot, message) {
+  switch (message.payload) {
     case 'show_cat':
-    bot.reply(message, {
-      attachment: {
-        type: 'image',
-        payload: {
-          url: 'http://i.imgur.com/zYIlgBl.png'
+      bot.reply(message, {
+        attachment: {
+          type: 'image',
+          payload: {
+            url: 'https://media.giphy.com/media/5xaOcLT4VhjRfudPcS4/giphy.gif'
+          }
         }
-      }
-    })
-    break
+      })
+      break
     case 'show_dog':
-    bot.reply(message, {
-      attachment: {
-        type: 'image',
-        payload: {
-          url: 'https://beepboophq.storage.googleapis.com/_web/en_US/bot.882475.jpg'
+      bot.reply(message, {
+        attachment: {
+          type: 'image',
+          payload: {
+            url: 'https://media.giphy.com/media/3o7ZeL5FH6Ap9jR9Kg/giphy.gif'
+          }
         }
-      }
-    })
-    break
+      })
+      break
   }
 })
